@@ -1,1 +1,19 @@
-The company that changes the world!
+# 🚀 HCorp
+**The company that changes the world.**
+
+HCorp is a deep-tech research company focused on developing advanced energy generation and propulsion systems to enable rapid human expansion into the solar system.
+
+## 🌌 Project Helios
+Project Helios is a live web application that models the fuel mass requirements for an Earth-to-Mars transit using the Tsiolkovsky Rocket Equation. 
+
+It mathematically demonstrates why traditional chemical rockets are structurally impossible for fast transit, and why HCorp's focus on advanced energy (Nuclear/Fusion) is required for a 30-day Mars mission.
+
+👉 **[Launch the Project Helios Web App](https://hcorp0.streamlit.app)**
+
+## ⚙️ Tech Stack
+* **Language:** Python
+* **Web Framework:** Streamlit
+* **Data Visualization:** Matplotlib
+
+---
+*Founder: Jake (Age 20) | Location: Texas, USA*
