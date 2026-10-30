@@ -2,7 +2,7 @@ import streamlit as st
 import math
 import matplotlib.pyplot as plt
 
-st.set_page_config(page_title="HCorp Project Helios v0.8", page_icon="💰", layout="wide")
+st.set_page_config(page_title="HCorp Project Helios v0.9", page_icon="💰", layout="wide")
 
 st.title("🚀 HCorp Systems: Project Helios v0.9")
 
