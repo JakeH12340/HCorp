@@ -2,23 +2,17 @@ import streamlit as st
 import math
 import matplotlib.pyplot as plt
 
-st.set_page_config(page_title="HCorp Project Helios v0.6", page_icon="🚀", layout="wide")
+st.set_page_config(page_title="HCorp Project Helios v0.7", page_icon="🌕", layout="wide")
 
-st.title("🚀 HCorp Systems: Project Helios v0.6")
+st.title("🚀 HCorp Systems: Project Helios v0.7")
 
-# Create two tabs
-tab1, tab2 = st.tabs(["📊 Mission Calculator", "⚛️ Fusion Physics (R&D)"])
+# Create three tabs
+tab1, tab2, tab3 = st.tabs(["📊 Mission Calculator", "⚛️ Fusion Physics", "🌕 Lunar Extraction"])
 
 # --- TAB 1: THE CALCULATOR ---
 with tab1:
     st.header("1. Mission Architecture")
-    launch_mode = st.radio(
-        "Select Launch Architecture:",
-        ["Single Launch from Earth", "Orbital Assembly (In Space)"]
-    )
-
-    st.write("---")
-    st.header("Phase 1: Earth to Low Earth Orbit (LEO)")
+    launch_mode = st.radio("Select Launch Architecture:", ["Single Launch from Earth", "Orbital Assembly (In Space)"])
     launch_ratio = math.exp(9400 / 4500) 
 
     if "Single Launch" in launch_mode:
@@ -40,21 +34,12 @@ with tab1:
         with columns[i]:
             st.subheader(engine_name)
             st.metric(label="Transit Mass Ratio", value=f"{transit_ratio:.2f}")
-            
-            if "Single Launch" in launch_mode:
-                total_ratio = launch_ratio * transit_ratio
-            else:
-                total_ratio = transit_ratio
-                
+            total_ratio = (launch_ratio * transit_ratio) if "Single Launch" in launch_mode else transit_ratio
             fuel_pct = ((total_ratio - 1) / total_ratio) * 100
             st.write(f"*(Fuel Weight: {fuel_pct:.1f}%)*")
-            
-            if total_ratio > 15:
-                st.error("CRITICAL: Structurally impossible.")
-            elif total_ratio > 5:
-                st.warning("HIGH FUEL: Payload limited.")
-            else:
-                st.success("OPTIMAL: Massive payload capacity.")
+            if total_ratio > 15: st.error("CRITICAL: Structurally impossible.")
+            elif total_ratio > 5: st.warning("HIGH FUEL: Payload limited.")
+            else: st.success("OPTIMAL: Massive payload capacity.")
 
     # Graph
     days_range = list(range(10, 121, 5))
@@ -83,25 +68,46 @@ with tab2:
     To achieve a 30-day transit to Mars, HCorp is researching **Direct Fusion Drive (DFD)** technology. 
     Unlike chemical rockets, which are limited by chemical bond energy, DFD uses the Strong Nuclear Force.
     """)
-    
     st.subheader("1. The Fuel: D-He3")
     st.write("""
     HCorp's engine will fuse **Deuterium (D)** and **Helium-3 (He-3)**. This reaction produces a high-energy **Proton** and Helium-4. 
     *   **Deuterium** is extracted from seawater on Earth.
-    *   **Helium-3** is rare on Earth, but abundant on the Lunar surface and in gas giant atmospheres. 
+    *   **Helium-3** is rare on Earth, but abundant on the Lunar surface.
     """)
-
     st.subheader("2. The Magnetic Nozzle")
     st.write("""
     Because the fusion plasma reaches temperatures over 100,000 degrees Celsius, no physical metal nozzle could survive. 
     Instead, HCorp uses superconducting magnets to create a **Magnetic Nozzle**. 
-    The magnetic field catches the charged Protons and directs them out the back of the ship at extreme speeds.
+    The magnetic field catches the charged Protons and directs them out the back of the ship.
     """)
 
-    st.subheader("3. The Math: Exhaust Velocity")
+# --- TAB 3: THE LUNAR EXTRACTION ---
+with tab3:
+    st.header("🌕 Lunar Helium-3 Extraction")
     st.write("""
-    Chemical exhaust velocity: **4,500 m/s**
-    HCorp Fusion exhaust velocity: **100,000 m/s**
+    Earth has almost no Helium-3. To fuel the HCorp Fusion Drive, HCorp must establish mining operations on the Moon. 
+    The Moon's regolith has been bombarded by solar wind for billions of years, trapping Helium-3 in the dust.
+    """)
     
-    By increasing the exhaust velocity, the Tsiolkovsky Rocket Equation exponentially reduces the amount of fuel required to reach Mars.
+    st.subheader("Lunar Mining Calculator")
+    st.write("Calculate how much lunar regolith must be processed to fuel a single Mars mission.")
+    
+    # Inputs
+    he3_per_mission = st.number_input("Helium-3 required per Mars mission (in metric tons):", min_value=1.0, max_value=100.0, value=25.0, step=1.0)
+    concentration = st.number_input("He-3 concentration in regolith (parts per billion - ppb):", min_value=1.0, max_value=50.0, value=20.0, step=1.0)
+    
+    # Math
+    # If concentration is 20 ppb, it means 20 grams per 1,000,000,000 grams (1,000,000 kg or 1,000 metric tons).
+    # So, 1 ton of regolith contains (concentration / 1000) kg of He-3.
+    # To get 1 ton of He-3, we need (1000 / (concentration / 1000)) tons of regolith.
+    # Simplified: (1,000,000 / concentration) tons of regolith per ton of He-3.
+    
+    regolith_per_ton = 1000000 / concentration
+    total_regolith_needed = regolith_per_ton * he3_per_mission
+    
+    st.metric(label="Regolith to be Processed", value=f"{total_regolith_needed:,.0f} Metric Tons")
+    
+    st.info(f"""
+    **The Challenge:** To fuel one 30-day Mars mission, HCorp rovers would need to excavate and heat {total_regolith_needed:,.0f} tons of lunar dirt. 
+    This is why HCorp is also researching compact nuclear fission reactors to power the massive lunar mining equipment, as solar power cannot survive the 14-day lunar night.
     """)
