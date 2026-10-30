@@ -2,12 +2,17 @@ import streamlit as st
 import math
 import matplotlib.pyplot as plt
 
-st.set_page_config(page_title="HCorp Project Helios v0.7", page_icon="🌕", layout="wide")
+st.set_page_config(page_title="HCorp Project Helios v0.8", page_icon="💰", layout="wide")
 
-st.title("🚀 HCorp Systems: Project Helios v0.7")
+st.title("🚀 HCorp Systems: Project Helios v0.8")
 
-# Create three tabs
-tab1, tab2, tab3 = st.tabs(["📊 Mission Calculator", "⚛️ Fusion Physics", "🌕 Lunar Extraction"])
+# Create four tabs
+tab1, tab2, tab3, tab4 = st.tabs([
+    "📊 Mission Calculator", 
+    "⚛️ Fusion Physics", 
+    "🌕 Lunar Extraction", 
+    "💰 Economic Analysis"
+])
 
 # --- TAB 1: THE CALCULATOR ---
 with tab1:
@@ -92,15 +97,8 @@ with tab3:
     st.subheader("Lunar Mining Calculator")
     st.write("Calculate how much lunar regolith must be processed to fuel a single Mars mission.")
     
-    # Inputs
     he3_per_mission = st.number_input("Helium-3 required per Mars mission (in metric tons):", min_value=1.0, max_value=100.0, value=25.0, step=1.0)
     concentration = st.number_input("He-3 concentration in regolith (parts per billion - ppb):", min_value=1.0, max_value=50.0, value=20.0, step=1.0)
-    
-    # Math
-    # If concentration is 20 ppb, it means 20 grams per 1,000,000,000 grams (1,000,000 kg or 1,000 metric tons).
-    # So, 1 ton of regolith contains (concentration / 1000) kg of He-3.
-    # To get 1 ton of He-3, we need (1000 / (concentration / 1000)) tons of regolith.
-    # Simplified: (1,000,000 / concentration) tons of regolith per ton of He-3.
     
     regolith_per_ton = 1000000 / concentration
     total_regolith_needed = regolith_per_ton * he3_per_mission
@@ -109,5 +107,69 @@ with tab3:
     
     st.info(f"""
     **The Challenge:** To fuel one 30-day Mars mission, HCorp rovers would need to excavate and heat {total_regolith_needed:,.0f} tons of lunar dirt. 
-    This is why HCorp is also researching compact nuclear fission reactors to power the massive lunar mining equipment, as solar power cannot survive the 14-day lunar night.
+    This is why HCorp is also researching compact nuclear fission reactors to power the massive lunar mining equipment.
+    """)
+
+# --- TAB 4: ECONOMIC ANALYSIS ---
+with tab4:
+    st.header("💰 Mission Economic Analysis")
+    st.write("Prove to investors why HCorp's Fusion Drive is the most cost-effective way to reach Mars. (Assumes Orbital Assembly for a 30-day transit).")
+
+    col_a, col_b, col_c = st.columns(3)
+    
+    with col_a:
+        dry_mass = st.number_input("Ship Dry Mass (Metric Tons):", min_value=10, max_value=5000, value=100, step=10)
+    with col_b:
+        chem_cost = st.number_input("Chemical Fuel Cost ($ per ton):", min_value=100, max_value=50000, value=5000, step=500)
+    with col_c:
+        he3_cost = st.number_input("Helium-3 Cost ($ per ton):", min_value=10000, max_value=5000000, value=500000, step=50000)
+
+    # Math for 30-day transit
+    dv = 7500 # 30 days
+    chem_ratio = math.exp(dv / 4500) # 5.29
+    fusion_ratio = math.exp(dv / 100000) # 1.08
+
+    # Total masses
+    chem_total_mass = dry_mass * chem_ratio
+    fusion_total_mass = dry_mass * fusion_ratio
+
+    # Fuel masses
+    chem_fuel_mass = chem_total_mass - dry_mass
+    fusion_fuel_mass = fusion_total_mass - dry_mass
+
+    # Total costs
+    chem_total_cost = chem_fuel_mass * chem_cost
+    fusion_total_cost = fusion_fuel_mass * he3_cost
+
+    st.write("---")
+    st.subheader("Results (30-Day Transit)")
+    
+    res1, res2 = st.columns(2)
+    
+    with res1:
+        st.write("**Chemical Rocket**")
+        st.write(f"Fuel Required: **{chem_fuel_mass:,.1f} tons**")
+        st.metric(label="Total Fuel Cost", value=f"${chem_total_cost:,.0f}")
+        
+    with res2:
+        st.write("**HCorp Fusion Drive**")
+        st.write(f"Fuel Required: **{fusion_fuel_mass:,.1f} tons**")
+        st.metric(label="Total Fuel Cost", value=f"${fusion_total_cost:,.0f}")
+
+    # Bar Chart
+    fig2, ax2 = plt.subplots(figsize=(8, 4))
+    bars = ax2.bar(["Chemical Rocket", "HCorp Fusion Drive"], [chem_total_cost, fusion_total_cost], color=['red', 'green'])
+    ax2.set_ylabel("Total Fuel Cost ($)")
+    ax2.set_title("Cost Comparison: 30-Day Mars Transit")
+    
+    # Add value labels on top of bars
+    for bar in bars:
+        yval = bar.get_height()
+        ax2.text(bar.get_x() + bar.get_width()/2, yval, f"${yval:,.0f}", ha='center', va='bottom')
+
+    st.pyplot(fig2)
+
+    st.info("""
+    **Note:** Even if Helium-3 costs $500,000 per ton, the HCorp Fusion Drive is cheaper because it requires almost *zero* fuel mass compared to a chemical rocket. 
+    Furthermore, mining He-3 on the Moon avoids the astronomical cost of launching thousands of tons of chemical fuel from Earth's gravity well.
     """)
