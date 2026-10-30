@@ -115,19 +115,21 @@ with tab4:
     st.header("💰 Mission Economic Analysis")
     st.write("Prove to investors why HCorp's Fusion Drive is the most cost-effective way to reach Mars. (Assumes Orbital Assembly for a 30-day transit).")
 
-    col_a, col_b, col_c = st.columns(3)
+    col_a, col_b, col_c, col_d = st.columns(4)
     
     with col_a:
         dry_mass = st.number_input("Ship Dry Mass (Metric Tons):", min_value=10, max_value=5000, value=100, step=10)
     with col_b:
-        chem_cost = st.number_input("Chemical Fuel Cost ($ per ton):", min_value=100, max_value=50000, value=5000, step=500)
+        chem_cost = st.number_input("Chemical Fuel Cost ($/ton):", min_value=100, max_value=50000, value=5000, step=500)
     with col_c:
-        he3_cost = st.number_input("Helium-3 Cost ($ per ton):", min_value=10000, max_value=5000000, value=500000, step=50000)
+        he3_cost = st.number_input("Helium-3 Cost ($/ton):", min_value=10000, max_value=5000000, value=500000, step=50000)
+    with col_d:
+        launch_cost = st.number_input("Cost to Launch 1 Ton to Orbit ($):", min_value=100000, max_value=5000000, value=1000000, step=100000)
 
     # Math for 30-day transit
-    dv = 7500 # 30 days
-    chem_ratio = math.exp(dv / 4500) # 5.29
-    fusion_ratio = math.exp(dv / 100000) # 1.08
+    dv = 7500
+    chem_ratio = math.exp(dv / 4500)
+    fusion_ratio = math.exp(dv / 100000)
 
     # Total masses
     chem_total_mass = dry_mass * chem_ratio
@@ -137,9 +139,17 @@ with tab4:
     chem_fuel_mass = chem_total_mass - dry_mass
     fusion_fuel_mass = fusion_total_mass - dry_mass
 
-    # Total costs
-    chem_total_cost = chem_fuel_mass * chem_cost
-    fusion_total_cost = fusion_fuel_mass * he3_cost
+    # Costs
+    chem_fuel_cost = chem_fuel_mass * chem_cost
+    fusion_fuel_cost = fusion_fuel_mass * he3_cost
+
+    # Launch Costs (You have to launch the fuel!)
+    chem_launch_cost = chem_fuel_mass * launch_cost
+    fusion_launch_cost = fusion_fuel_mass * launch_cost
+
+    # Total Costs
+    chem_total = chem_fuel_cost + chem_launch_cost
+    fusion_total = fusion_fuel_cost + fusion_launch_cost
 
     st.write("---")
     st.subheader("Results (30-Day Transit)")
@@ -148,21 +158,24 @@ with tab4:
     
     with res1:
         st.write("**Chemical Rocket**")
-        st.write(f"Fuel Required: **{chem_fuel_mass:,.1f} tons**")
-        st.metric(label="Total Fuel Cost", value=f"${chem_total_cost:,.0f}")
+        st.write(f"Fuel Mass: **{chem_fuel_mass:,.1f} tons**")
+        st.write(f"Fuel Cost: ${chem_fuel_cost:,.0f}")
+        st.write(f"Launch Cost: ${chem_launch_cost:,.0f}")
+        st.metric(label="Total Mission Cost", value=f"${chem_total:,.0f}")
         
     with res2:
         st.write("**HCorp Fusion Drive**")
-        st.write(f"Fuel Required: **{fusion_fuel_mass:,.1f} tons**")
-        st.metric(label="Total Fuel Cost", value=f"${fusion_total_cost:,.0f}")
+        st.write(f"Fuel Mass: **{fusion_fuel_mass:,.1f} tons**")
+        st.write(f"Fuel Cost: ${fusion_fuel_cost:,.0f}")
+        st.write(f"Launch Cost: ${fusion_launch_cost:,.0f}")
+        st.metric(label="Total Mission Cost", value=f"${fusion_total:,.0f}")
 
     # Bar Chart
     fig2, ax2 = plt.subplots(figsize=(8, 4))
-    bars = ax2.bar(["Chemical Rocket", "HCorp Fusion Drive"], [chem_total_cost, fusion_total_cost], color=['red', 'green'])
-    ax2.set_ylabel("Total Fuel Cost ($)")
-    ax2.set_title("Cost Comparison: 30-Day Mars Transit")
+    bars = ax2.bar(["Chemical Rocket", "HCorp Fusion Drive"], [chem_total, fusion_total], color=['red', 'green'])
+    ax2.set_ylabel("Total Mission Cost ($)")
+    ax2.set_title("Total Cost (Fuel + Launch): 30-Day Mars Transit")
     
-    # Add value labels on top of bars
     for bar in bars:
         yval = bar.get_height()
         ax2.text(bar.get_x() + bar.get_width()/2, yval, f"${yval:,.0f}", ha='center', va='bottom')
@@ -170,6 +183,5 @@ with tab4:
     st.pyplot(fig2)
 
     st.info("""
-    **Note:** Even if Helium-3 costs $500,000 per ton, the HCorp Fusion Drive is cheaper because it requires almost *zero* fuel mass compared to a chemical rocket. 
-    Furthermore, mining He-3 on the Moon avoids the astronomical cost of launching thousands of tons of chemical fuel from Earth's gravity well.
+    **The HCorp Advantage:** Even if Helium-3 is incredibly expensive, the HCorp Fusion Drive requires so little fuel mass that it avoids the astronomical cost of launching thousands of tons of chemical fuel into orbit.
     """)
