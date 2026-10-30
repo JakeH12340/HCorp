@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 st.set_page_config(page_title="HCorp Project Helios v0.8", page_icon="💰", layout="wide")
 
-st.title("🚀 HCorp Systems: Project Helios v0.8")
+st.title("🚀 HCorp Systems: Project Helios v0.9")
 
 # Create four tabs
 tab1, tab2, tab3, tab4 = st.tabs([
