@@ -8,7 +8,7 @@ Project Helios is a live web application that models the fuel mass requirements 
 
 It mathematically demonstrates why traditional chemical rockets are structurally impossible for fast transit, and why HCorp's focus on advanced energy (Nuclear/Fusion) is required for a 30-day Mars mission.
 
-👉 **[Launch the Project Helios Web App] https://hcorp0.streamlit.app
+👉 **[Launch the Project Helios Web App]
 ## ⚙️ Tech Stack
 * **Language:** Python
 * **Web Framework:** Streamlit
