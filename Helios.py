@@ -2,9 +2,10 @@ import streamlit as st
 import math
 import matplotlib.pyplot as plt
 
-st.set_page_config(page_title="HCorp Project Helios v0.9", page_icon="💰", layout="wide")
+st.set_page_config(page_title="HCorp Project Scions", page_icon="🦅", layout="wide")
 
-st.title("🚀 HCorp Systems: Project Helios v0.9")
+st.title("🦅 HCorp Systems: Project Scions")
+st.subheader("Advanced Propulsion & Solar System Logistics")
 
 # Create four tabs
 tab1, tab2, tab3, tab4 = st.tabs([
@@ -16,7 +17,7 @@ tab1, tab2, tab3, tab4 = st.tabs([
 
 # --- TAB 1: THE CALCULATOR ---
 with tab1:
-    st.header("1. Mission Architecture")
+    st.header("1. Scion Mission Architecture")
     launch_mode = st.radio("Select Launch Architecture:", ["Single Launch from Earth", "Orbital Assembly (In Space)"])
     launch_ratio = math.exp(9400 / 4500) 
 
@@ -70,7 +71,7 @@ with tab1:
 with tab2:
     st.header("The HCorp Direct Fusion Drive (DFD)")
     st.write("""
-    To achieve a 30-day transit to Mars, HCorp is researching **Direct Fusion Drive (DFD)** technology. 
+    To achieve the Scion mission timeline, HCorp is researching **Direct Fusion Drive (DFD)** technology. 
     Unlike chemical rockets, which are limited by chemical bond energy, DFD uses the Strong Nuclear Force.
     """)
     st.subheader("1. The Fuel: D-He3")
@@ -90,7 +91,7 @@ with tab2:
 with tab3:
     st.header("🌕 Lunar Helium-3 Extraction")
     st.write("""
-    Earth has almost no Helium-3. To fuel the HCorp Fusion Drive, HCorp must establish mining operations on the Moon. 
+    Earth has almost no Helium-3. To fuel the Scion missions, HCorp must establish mining operations on the Moon. 
     The Moon's regolith has been bombarded by solar wind for billions of years, trapping Helium-3 in the dust.
     """)
     
@@ -106,13 +107,13 @@ with tab3:
     st.metric(label="Regolith to be Processed", value=f"{total_regolith_needed:,.0f} Metric Tons")
     
     st.info(f"""
-    **The Challenge:** To fuel one 30-day Mars mission, HCorp rovers would need to excavate and heat {total_regolith_needed:,.0f} tons of lunar dirt. 
+    **The Challenge:** To fuel one Scion mission, HCorp rovers would need to excavate and heat {total_regolith_needed:,.0f} tons of lunar dirt. 
     This is why HCorp is also researching compact nuclear fission reactors to power the massive lunar mining equipment.
     """)
 
 # --- TAB 4: ECONOMIC ANALYSIS ---
 with tab4:
-    st.header("💰 Mission Economic Analysis")
+    st.header("💰 Project Scions: Economic Analysis")
     st.write("Prove to investors why HCorp's Fusion Drive is the most cost-effective way to reach Mars. (Assumes Orbital Assembly for a 30-day transit).")
 
     col_a, col_b, col_c, col_d = st.columns(4)
@@ -143,7 +144,7 @@ with tab4:
     chem_fuel_cost = chem_fuel_mass * chem_cost
     fusion_fuel_cost = fusion_fuel_mass * he3_cost
 
-    # Launch Costs (You have to launch the fuel!)
+    # Launch Costs
     chem_launch_cost = chem_fuel_mass * launch_cost
     fusion_launch_cost = fusion_fuel_mass * launch_cost
 
@@ -174,7 +175,7 @@ with tab4:
     fig2, ax2 = plt.subplots(figsize=(8, 4))
     bars = ax2.bar(["Chemical Rocket", "HCorp Fusion Drive"], [chem_total, fusion_total], color=['red', 'green'])
     ax2.set_ylabel("Total Mission Cost ($)")
-    ax2.set_title("Total Cost (Fuel + Launch): 30-Day Mars Transit")
+    ax2.set_title("Project Scions: Total Cost (Fuel + Launch)")
     
     for bar in bars:
         yval = bar.get_height()
