@@ -15,5 +15,5 @@ It mathematically demonstrates why traditional chemical rockets are structurally
 * **Data Visualization:** Matplotlib
 
 ---
-*Founder: Jake (Age 20)
-*And the only person in this company as of Late 2026.
+Founder: Jake (Age 20)
+And the only person in this company as of Late 2026.
