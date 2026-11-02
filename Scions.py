@@ -157,32 +157,35 @@ with tab6:
         If asked about anything unrelated to space, energy, or business, remind the Founder that our focus must remain on the mission.
         """
         
-        # USING THE UPDATED MODEL NAME HERE:
-        model = genai.GenerativeModel('gemini-1.5-flash-latest', system_instruction=system_prompt)
+        try:
+            # USING THE STANDARD MODEL NAME HERE
+            model = genai.GenerativeModel('gemini-1.5-flash', system_instruction=system_prompt)
 
-        # Initialize chat history in Streamlit session state
-        if "chat_session" not in st.session_state:
-            st.session_state.chat_session = model.start_chat(history=[])
-            st.session_state.messages = [{"role": "assistant", "content": "HCorp Strategic AI Core online. Awaiting your command, Founder."}]
+            # Initialize chat history in Streamlit session state
+            if "chat_session" not in st.session_state:
+                st.session_state.chat_session = model.start_chat(history=[])
+                st.session_state.messages = [{"role": "assistant", "content": "HCorp Strategic AI Core online. Awaiting your command, Founder."}]
 
-        # Display chat messages
-        for message in st.session_state.messages:
-            with st.chat_message(message["role"]):
-                st.markdown(message["content"])
+            # Display chat messages
+            for message in st.session_state.messages:
+                with st.chat_message(message["role"]):
+                    st.markdown(message["content"])
 
-        # Accept user input
-        if prompt := st.chat_input("Query the HCorp AI..."):
-            # Add user message to UI
-            st.session_state.messages.append({"role": "user", "content": prompt})
-            with st.chat_message("user"):
-                st.markdown(prompt)
+            # Accept user input
+            if prompt := st.chat_input("Query the HCorp AI..."):
+                # Add user message to UI
+                st.session_state.messages.append({"role": "user", "content": prompt})
+                with st.chat_message("user"):
+                    st.markdown(prompt)
 
-            # Get AI response
-            with st.chat_message("assistant"):
-                try:
+                # Get AI response
+                with st.chat_message("assistant"):
                     response = st.session_state.chat_session.send_message(prompt)
                     st.markdown(response.text)
-                    # Save AI response to history
-                    st.session_state.messages.append({"role": "assistant", "content": response.text})
-                except Exception as e:
-                    st.error(f"AI Core Error: {str(e)}")
+                    
+                # Save AI response to history
+                st.session_state.messages.append({"role": "assistant", "content": response.text})
+                
+        except Exception as e:
+            st.error(f"AI Core Error: {str(e)}")
+            st.info("If you still see a 404 error, go to your Streamlit dashboard, click 'Manage App' in the bottom right, and click 'Reboot' to force it to install the updated library.")
