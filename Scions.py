@@ -7,7 +7,6 @@ st.set_page_config(page_title="HCorp Project Scions", page_icon="🦅", layout="
 st.title("🦅 HCorp Systems: Project Scions")
 st.subheader("Advanced Propulsion & Solar System Logistics")
 
-# Create four tabs
 tab1, tab2, tab3, tab4 = st.tabs([
     "📊 Mission Calculator", 
     "⚛️ Fusion Physics", 
@@ -28,8 +27,19 @@ with tab1:
 
     st.write("---")
     st.header("Phase 2: LEO to Mars Transit")
+    
+    # NEW: Distance Slider
+    st.write("Earth and Mars orbit the Sun at different speeds. The distance between them changes constantly.")
+    distance_mkm = st.slider("Distance to Mars (Million Kilometers)", min_value=55, max_value=400, value=225, step=5)
+    
     days = st.slider("Desired Mars Transit Time (Days)", min_value=1, max_value=120, value=30, step=1)
-    transit_dv = 225000 / days
+    
+    # Brachistochrone Delta-V Math: Delta-V = 4 * Distance / Time
+    distance_meters = distance_mkm * 10**9
+    time_seconds = days * 24 * 3600
+    transit_dv = (4 * distance_meters) / time_seconds
+    
+    st.write(f"**Required Transit Delta-V:** {transit_dv:,.0f} m/s")
     
     ENGINES = {"Chemical Rocket": 4500, "Nuclear Thermal": 9000, "HCorp Fusion Drive": 100000}
     col1, col2, col3 = st.columns(3)
@@ -49,12 +59,10 @@ with tab1:
 
     st.write("---")
     st.header("Phase 3: Human Physiology (G-Force Limits)")
-    st.write("Project Scions utilizes a constant-thrust Brachistochrone trajectory (accelerating to the midpoint, then flipping and decelerating). This calculates the physical forces on the crew.")
+    st.write("Project Scions utilizes a constant-thrust Brachistochrone trajectory. This calculates the physical forces on the crew.")
     
-    # Brachistochrone math
-    distance_mars = 225 * 10**9 # 225 million km in meters
-    time_seconds = days * 24 * 3600
-    acceleration = (4 * distance_mars) / (time_seconds**2)
+    # Brachistochrone acceleration math: a = 4 * Distance / Time^2
+    acceleration = (4 * distance_meters) / (time_seconds**2)
     g_force = acceleration / 9.81
     
     col_g1, col_g2 = st.columns(2)
@@ -73,13 +81,15 @@ with tab1:
         st.success("OPTIMAL: Safe for human crew. Provides a comfortable gravity environment.")
 
     # Graph 1: Fuel Mass
+    # To keep the graph clean, we calculate fuel mass at the currently selected distance
     days_range = list(range(1, 121, 2))
     fig, ax = plt.subplots(figsize=(10, 3))
     colors = {"Chemical Rocket": "red", "Nuclear Thermal": "orange", "HCorp Fusion Drive": "green"}
     for engine_name, exhaust_velocity in ENGINES.items():
         total_ratios = []
         for d in days_range:
-            t_dv = 225000 / d
+            t_time = d * 24 * 3600
+            t_dv = (4 * distance_meters) / t_time
             t_ratio = math.exp(t_dv / exhaust_velocity)
             total_r = launch_ratio * t_ratio if "Single Launch" in launch_mode else t_ratio
             total_fuel_pct = ((total_r - 1) / total_r) * 100
@@ -150,7 +160,8 @@ with tab4:
     with col_d:
         launch_cost = st.number_input("Cost to Launch 1 Ton to Orbit ($):", min_value=100000, max_value=5000000, value=1000000, step=100000)
 
-    dv = 7500
+    # We will use the 225 million km average for the economic baseline
+    dv = 7500 
     chem_ratio = math.exp(dv / 4500)
     fusion_ratio = math.exp(dv / 100000)
 
@@ -170,7 +181,7 @@ with tab4:
     fusion_total = fusion_fuel_cost + fusion_launch_cost
 
     st.write("---")
-    st.subheader("Results (30-Day Transit)")
+    st.subheader("Results (30-Day Transit @ 225M km Average)")
     
     res1, res2 = st.columns(2)
     
