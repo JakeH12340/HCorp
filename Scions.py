@@ -28,7 +28,7 @@ with tab1:
 
     st.write("---")
     st.header("Phase 2: LEO to Mars Transit")
-    days = st.slider("Desired Mars Transit Time (Days)", min_value=10, max_value=120, value=30, step=1)
+    days = st.slider("Desired Mars Transit Time (Days)", min_value=1, max_value=120, value=30, step=1)
     transit_dv = 225000 / days
     
     ENGINES = {"Chemical Rocket": 4500, "Nuclear Thermal": 9000, "HCorp Fusion Drive": 100000}
@@ -47,8 +47,33 @@ with tab1:
             elif total_ratio > 5: st.warning("HIGH FUEL: Payload limited.")
             else: st.success("OPTIMAL: Massive payload capacity.")
 
-    # Graph
-    days_range = list(range(10, 121, 5))
+    st.write("---")
+    st.header("Phase 3: Human Physiology (G-Force Limits)")
+    st.write("Project Scions utilizes a constant-thrust Brachistochrone trajectory (accelerating to the midpoint, then flipping and decelerating). This calculates the physical forces on the crew.")
+    
+    # Brachistochrone math
+    distance_mars = 225 * 10**9 # 225 million km in meters
+    time_seconds = days * 24 * 3600
+    acceleration = (4 * distance_mars) / (time_seconds**2)
+    g_force = acceleration / 9.81
+    
+    col_g1, col_g2 = st.columns(2)
+    with col_g1:
+        st.metric(label="Sustained Acceleration", value=f"{acceleration:.2f} m/s²")
+    with col_g2:
+        st.metric(label="Sustained G-Force", value=f"{g_force:.2f} G")
+
+    if g_force > 4.0:
+        st.error("CRITICAL: Lethal to human crew. Astronauts would not survive the transit.")
+    elif g_force > 1.5:
+        st.warning("HIGH G: Unsafe for sustained periods. Astronauts risk severe physiological damage.")
+    elif g_force < 0.05:
+        st.info("MICROGRAVITY: Crew will experience zero-g. Requires rigorous exercise regimens to prevent bone/muscle loss.")
+    else:
+        st.success("OPTIMAL: Safe for human crew. Provides a comfortable gravity environment.")
+
+    # Graph 1: Fuel Mass
+    days_range = list(range(1, 121, 2))
     fig, ax = plt.subplots(figsize=(10, 3))
     colors = {"Chemical Rocket": "red", "Nuclear Thermal": "orange", "HCorp Fusion Drive": "green"}
     for engine_name, exhaust_velocity in ENGINES.items():
@@ -96,8 +121,6 @@ with tab3:
     """)
     
     st.subheader("Lunar Mining Calculator")
-    st.write("Calculate how much lunar regolith must be processed to fuel a single Mars mission.")
-    
     he3_per_mission = st.number_input("Helium-3 required per Mars mission (in metric tons):", min_value=1.0, max_value=100.0, value=25.0, step=1.0)
     concentration = st.number_input("He-3 concentration in regolith (parts per billion - ppb):", min_value=1.0, max_value=50.0, value=20.0, step=1.0)
     
@@ -114,7 +137,7 @@ with tab3:
 # --- TAB 4: ECONOMIC ANALYSIS ---
 with tab4:
     st.header("💰 Project Scions: Economic Analysis")
-    st.write("Prove to investors why HCorp's Fusion Drive is the most cost-effective way to reach Mars. (Assumes Orbital Assembly for a 30-day transit).")
+    st.write("Prove to investors why HCorp's Fusion Drive is the most cost-effective way to reach Mars. (Assumes Orbital Assembly).")
 
     col_a, col_b, col_c, col_d = st.columns(4)
     
@@ -127,28 +150,22 @@ with tab4:
     with col_d:
         launch_cost = st.number_input("Cost to Launch 1 Ton to Orbit ($):", min_value=100000, max_value=5000000, value=1000000, step=100000)
 
-    # Math for 30-day transit
     dv = 7500
     chem_ratio = math.exp(dv / 4500)
     fusion_ratio = math.exp(dv / 100000)
 
-    # Total masses
     chem_total_mass = dry_mass * chem_ratio
     fusion_total_mass = dry_mass * fusion_ratio
 
-    # Fuel masses
     chem_fuel_mass = chem_total_mass - dry_mass
     fusion_fuel_mass = fusion_total_mass - dry_mass
 
-    # Costs
     chem_fuel_cost = chem_fuel_mass * chem_cost
     fusion_fuel_cost = fusion_fuel_mass * he3_cost
 
-    # Launch Costs
     chem_launch_cost = chem_fuel_mass * launch_cost
     fusion_launch_cost = fusion_fuel_mass * launch_cost
 
-    # Total Costs
     chem_total = chem_fuel_cost + chem_launch_cost
     fusion_total = fusion_fuel_cost + fusion_launch_cost
 
@@ -171,7 +188,6 @@ with tab4:
         st.write(f"Launch Cost: ${fusion_launch_cost:,.0f}")
         st.metric(label="Total Mission Cost", value=f"${fusion_total:,.0f}")
 
-    # Bar Chart
     fig2, ax2 = plt.subplots(figsize=(8, 4))
     bars = ax2.bar(["Chemical Rocket", "HCorp Fusion Drive"], [chem_total, fusion_total], color=['red', 'green'])
     ax2.set_ylabel("Total Mission Cost ($)")
