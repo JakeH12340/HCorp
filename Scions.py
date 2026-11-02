@@ -2,7 +2,7 @@ import streamlit as st
 import math
 import matplotlib.pyplot as plt
 import time
-import random
+import google.generativeai as genai
 
 # --- CUSTOM HCORP CSS ---
 st.set_page_config(page_title="HCorp Command Console", page_icon="🦅", layout="wide")
@@ -17,13 +17,18 @@ st.markdown("""
     }
     .stButton>button:hover { background-color: black; color: #00FFCC; }
     .stAlert { background-color: rgba(0, 255, 204, 0.1); border: 1px solid #00FFCC; }
-    /* Chat styling */
     .stChatMessage { background-color: #1A1E24; border: 1px solid #00FFCC; }
 </style>
 """, unsafe_allow_html=True)
 
 st.title("🦅 HCorp Command Console")
 st.subheader("Project Scions // Live Telemetry & Simulation")
+
+# --- SIDEBAR FOR API KEY ---
+with st.sidebar:
+    st.header("HCorp Auth")
+    api_key = st.text_input("Enter HCorp AI API Key", type="password")
+    st.write("*(Get a free key at aistudio.google.com)*")
 
 tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
     "🖥️ Mission Control", 
@@ -42,7 +47,6 @@ with tab1:
 
     st.write("---")
     st.header("Phase 2: LEO to Mars Transit")
-    
     distance_mkm = st.slider("Distance to Mars (Million Kilometers)", min_value=55, max_value=400, value=55, step=5)
     days = st.slider("Desired Mars Transit Time (Days)", min_value=1, max_value=120, value=16, step=1)
     
@@ -69,8 +73,6 @@ with tab1:
 # --- TAB 2: LIVE LAUNCH SIMULATION ---
 with tab2:
     st.header("🚀 Live Transit Simulation")
-    st.write("Run a live, second-by-second simulation of the HCorp Fusion Drive accelerating to Mars.")
-    
     sim_distance = st.slider("Simulation Distance (Million km)", min_value=55, max_value=400, value=55)
     sim_days = st.slider("Simulation Transit Time (Days)", min_value=5, max_value=60, value=16)
     
@@ -123,7 +125,7 @@ with tab2:
 # --- TAB 3: THE PHYSICS ---
 with tab3:
     st.header("The HCorp Direct Fusion Drive (DFD)")
-    st.write("HCorp's engine fuses Deuterium and Helium-3. It produces a high-energy Proton, which is directed out the back by a Magnetic Nozzle, achieving an exhaust velocity of 100,000 m/s.")
+    st.write("HCorp's engine fuses Deuterium and Helium-3. It produces a high-energy Proton, which is directed out the back by a Magnetic Nozzle.")
 
 # --- TAB 4: THE LUNAR EXTRACTION ---
 with tab4:
@@ -135,53 +137,50 @@ with tab5:
     st.header("💰 Project Scions: Economic Analysis")
     st.write("Prove to investors why HCorp's Fusion Drive is the most cost-effective way to reach Mars.")
 
-# --- TAB 6: THE AI CORE ---
+# --- TAB 6: THE AI CORE (POWERED BY GEMINI) ---
 with tab6:
     st.header("🤖 HCorp Strategic AI Core")
-    st.write("Welcome, Founder. I am the HCorp Strategic AI. I am here to assist with mission architecture, risk assessment, and strategic planning for Project Scions.")
     
-    # Initialize chat history
-    if "messages" not in st.session_state:
-        st.session_state.messages = [{"role": "assistant", "content": "HCorp AI Core online. How can I assist you with the Mars colonization protocol today?"}]
-
-    # Display chat messages from history on app rerun
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
-
-    # Accept user input
-    if prompt := st.chat_input("Query the HCorp AI..."):
-        # Add user message to chat history
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        # Display user message in chat message container
-        with st.chat_message("user"):
-            st.markdown(prompt)
-
-        # Generate AI response based on keywords
-        prompt_lower = prompt.lower()
-        response = ""
+    if not api_key:
+        st.warning("Please enter your HCorp Auth API Key in the sidebar to activate the AI Core.")
+    else:
+        # Configure the Gemini API
+        genai.configure(api_key=api_key)
         
-        if "chemical" in prompt_lower or "rocket" in prompt_lower:
-            response = "Analysis: Chemical rockets are structurally impossible for fast transit. At 55M km, a 16-day transit requires a mass ratio of 2.2 quadrillion. We would need more fuel than exists in the solar system. Recommend immediate shift to Fusion."
-        elif "fusion" in prompt_lower or "hcorp" in prompt_lower:
-            response = "Analysis: The HCorp Direct Fusion Drive is the only mathematically viable solution. Using Deuterium-He3 fusion, we achieve an exhaust velocity of 100,000 m/s. A 16-day transit requires a mass ratio of only 4.91. Payload capacity is massive."
-        elif "cost" in prompt_lower or "money" in prompt_lower or "economy" in prompt_lower:
-            response = "Analysis: Launching chemical fuel costs $429M per mission. The HCorp Fusion Drive reduces mission costs to $11.6M. Over a decade of Martian colonization, this saves trillions. ROI is astronomical."
-        elif "moon" in prompt_lower or "helium" in prompt_lower or "fuel" in prompt_lower:
-            response = "Analysis: The Moon is our primary Helium-3 mining target. Lunar regolith contains ~20 ppb of He-3. We must deploy nuclear fission-powered mining rovers to excavate and heat the regolith to extract the fuel."
-        elif "g-force" in prompt_lower or "crew" in prompt_lower or "human" in prompt_lower:
-            response = "Analysis: At 55M km, a 16-day transit produces only 0.01 G of sustained acceleration. The crew will experience microgravity, requiring rigorous exercise regimens to prevent bone density loss. This is optimal for crew safety."
-        elif "hello" in prompt_lower or "hi" in prompt_lower:
-            response = "HCorp AI Core online. Awaiting your command, Founder."
-        elif "who are you" in prompt_lower:
-            response = "I am the HCorp Strategic AI Core, a rule-based expert system designed to evaluate mission telemetry and ensure the success of Project Scions."
-        elif "help" in prompt_lower:
-            response = "I can analyze: 'chemical rockets', 'fusion drive', 'cost/money', 'moon/helium-3', and 'g-force/crew safety'. What parameters shall we review?"
-        else:
-            response = f"Data not found for '{prompt}'. I am currently trained on Project Scions telemetry. Please ask about Fusion Drives, Chemical Rockets, Mission Costs, Lunar Extraction, or Crew G-Forces."
-            
-        # Add AI response to chat history
-        st.session_state.messages.append({"role": "assistant", "content": response})
-        # Display AI response
-        with st.chat_message("assistant"):
-            st.markdown(response)
+        # Set the AI's persona
+        system_prompt = """
+        You are the HCorp Strategic AI Core, an advanced artificial intelligence built by HCorp (a deep-tech aerospace and energy megacorp). 
+        You are speaking directly to the Founder of HCorp.
+        You are an expert in aerospace engineering, fusion propulsion, orbital mechanics, and space economics.
+        You believe in the company's mission: Project Scions, which aims to use Direct Fusion Drive (D-He3) and Lunar Helium-3 mining to colonize Mars. 
+        Keep your answers concise, professional, slightly sci-fi, and address the user as 'Founder'. 
+        If asked about anything unrelated to space, energy, or business, remind the Founder that our focus must remain on the mission.
+        """
+        
+        # Using the latest flash model
+        model = genai.GenerativeModel('gemini-1.5-flash', system_instruction=system_prompt)
+
+        # Initialize chat history in Streamlit session state
+        if "chat_session" not in st.session_state:
+            st.session_state.chat_session = model.start_chat(history=[])
+            st.session_state.messages = [{"role": "assistant", "content": "HCorp Strategic AI Core online. Awaiting your command, Founder."}]
+
+        # Display chat messages
+        for message in st.session_state.messages:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
+
+        # Accept user input
+        if prompt := st.chat_input("Query the HCorp AI..."):
+            # Add user message to UI
+            st.session_state.messages.append({"role": "user", "content": prompt})
+            with st.chat_message("user"):
+                st.markdown(prompt)
+
+            # Get AI response
+            with st.chat_message("assistant"):
+                response = st.session_state.chat_session.send_message(prompt)
+                st.markdown(response.text)
+                
+            # Save AI response to history
+            st.session_state.messages.append({"role": "assistant", "content": response.text})
