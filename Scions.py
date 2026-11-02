@@ -157,8 +157,8 @@ with tab6:
         If asked about anything unrelated to space, energy, or business, remind the Founder that our focus must remain on the mission.
         """
         
-        # Using the latest flash model
-        model = genai.GenerativeModel('gemini-1.5-flash', system_instruction=system_prompt)
+        # USING THE UPDATED MODEL NAME HERE:
+        model = genai.GenerativeModel('gemini-1.5-flash-latest', system_instruction=system_prompt)
 
         # Initialize chat history in Streamlit session state
         if "chat_session" not in st.session_state:
@@ -179,8 +179,10 @@ with tab6:
 
             # Get AI response
             with st.chat_message("assistant"):
-                response = st.session_state.chat_session.send_message(prompt)
-                st.markdown(response.text)
-                
-            # Save AI response to history
-            st.session_state.messages.append({"role": "assistant", "content": response.text})
+                try:
+                    response = st.session_state.chat_session.send_message(prompt)
+                    st.markdown(response.text)
+                    # Save AI response to history
+                    st.session_state.messages.append({"role": "assistant", "content": response.text})
+                except Exception as e:
+                    st.error(f"AI Core Error: {str(e)}")
