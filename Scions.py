@@ -2,49 +2,36 @@ import streamlit as st
 import math
 import matplotlib.pyplot as plt
 import time
+import random
 
-# --- CUSTOM HCORP CSS (MAKES IT LOOK ALIVE) ---
+# --- CUSTOM HCORP CSS ---
 st.set_page_config(page_title="HCorp Command Console", page_icon="🦅", layout="wide")
 
 st.markdown("""
 <style>
-    /* Dark Theme */
-    .stApp {
-        background-color: #0E1117;
-        color: #00FFCC;
-    }
-    /* Glowing Text */
-    h1, h2, h3, p, div {
-        font-family: 'Courier New', Courier, monospace !important;
-    }
+    .stApp { background-color: #0E1117; color: #00FFCC; }
+    h1, h2, h3, p, div { font-family: 'Courier New', Courier, monospace !important; }
     .stButton>button {
-        background-color: #00FFCC;
-        color: black;
-        border: 2px solid #00FFCC;
-        font-weight: bold;
-        box-shadow: 0px 0px 15px #00FFCC;
+        background-color: #00FFCC; color: black; border: 2px solid #00FFCC;
+        font-weight: bold; box-shadow: 0px 0px 15px #00FFCC;
     }
-    .stButton>button:hover {
-        background-color: black;
-        color: #00FFCC;
-    }
-    /* Custom Alert Box */
-    .stAlert {
-        background-color: rgba(0, 255, 204, 0.1);
-        border: 1px solid #00FFCC;
-    }
+    .stButton>button:hover { background-color: black; color: #00FFCC; }
+    .stAlert { background-color: rgba(0, 255, 204, 0.1); border: 1px solid #00FFCC; }
+    /* Chat styling */
+    .stChatMessage { background-color: #1A1E24; border: 1px solid #00FFCC; }
 </style>
 """, unsafe_allow_html=True)
 
 st.title("🦅 HCorp Command Console")
 st.subheader("Project Scions // Live Telemetry & Simulation")
 
-tab1, tab2, tab3, tab4, tab5 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
     "🖥️ Mission Control", 
     "🚀 Live Launch Sim", 
     "⚛️ Fusion Physics", 
     "🌕 Lunar Extraction", 
-    "💰 Economic Analysis"
+    "💰 Economic Analysis",
+    "🤖 HCorp AI Core"
 ])
 
 # --- TAB 1: MISSION CONTROL ---
@@ -79,17 +66,6 @@ with tab1:
             elif total_ratio > 5: st.warning("HIGH FUEL: Payload limited.")
             else: st.success("OPTIMAL: Massive payload capacity.")
 
-    st.write("---")
-    st.header("Phase 3: Human Physiology (G-Force Limits)")
-    acceleration = (4 * distance_meters) / (time_seconds**2)
-    g_force = acceleration / 9.81
-    
-    col_g1, col_g2 = st.columns(2)
-    with col_g1:
-        st.metric(label="Sustained Acceleration", value=f"{acceleration:.2f} m/s²")
-    with col_g2:
-        st.metric(label="Sustained G-Force", value=f"{g_force:.2f} G")
-
 # --- TAB 2: LIVE LAUNCH SIMULATION ---
 with tab2:
     st.header("🚀 Live Transit Simulation")
@@ -100,71 +76,54 @@ with tab2:
     
     if st.button("INITIATE SCION LAUNCH SEQUENCE"):
         st.write("**HCorp OS: Launch sequence initiated...**")
-        
-        # Set up the live chart
         chart_placeholder = st.empty()
         progress_bar = st.progress(0)
         
-        # Simulation variables
         total_seconds = sim_days * 24 * 3600
         dv = (4 * (sim_distance * 10**9)) / total_seconds
         v_max = dv / 2
         
-        # Generate data for the animation
         steps = 100
         distances = []
         velocities = []
         
         for i in range(steps + 1):
-            # Calculate time progression
             current_time = (total_seconds / 2) * (i / steps)
-            
-            # Acceleration phase
             if i <= 50:
                 a = dv / total_seconds
                 v = a * current_time
                 d = 0.5 * a * (current_time**2)
-            # Deceleration phase
             else:
                 a = -(dv / total_seconds)
                 t_dec = current_time - (total_seconds / 2)
                 v = v_max + (a * t_dec)
                 d = (0.5 * (dv / total_seconds) * ((total_seconds/2)**2)) + (v_max * t_dec) + (0.5 * a * (t_dec**2))
             
-            distances.append(d / 10**9) # Convert to million km
+            distances.append(d / 10**9)
             velocities.append(v)
             
-            # Update UI
             if i % 5 == 0 or i == steps:
                 fig, ax = plt.subplots(figsize=(10, 3))
                 fig.patch.set_facecolor('#0E1117')
                 ax.set_facecolor('#0E1117')
-                
-                # Plot distance
                 ax.plot(distances, velocities, color='#00FFCC', linewidth=3)
                 ax.set_title("Ship Velocity vs Distance (Million km)", color='white')
                 ax.set_xlabel("Distance to Mars (Million km)", color='white')
                 ax.set_ylabel("Velocity (m/s)", color='white')
                 ax.tick_params(colors='white')
                 ax.grid(True, color='gray', linestyle='--', alpha=0.3)
-                
-                # Set bounds
                 ax.set_xlim(0, sim_distance)
                 ax.set_ylim(0, v_max * 1.1)
-                
                 chart_placeholder.pyplot(fig)
                 progress_bar.progress(i / steps)
-                time.sleep(0.05) # Animation speed
+                time.sleep(0.05)
                 
         st.success("Orbital insertion at Mars complete. Welcome to the Scions.")
 
 # --- TAB 3: THE PHYSICS ---
 with tab3:
     st.header("The HCorp Direct Fusion Drive (DFD)")
-    st.write("""
-    To achieve the Scion mission timeline, HCorp is researching **Direct Fusion Drive (DFD)** technology. 
-    Unlike chemical rockets, which are limited by chemical bond energy, DFD uses the Strong Nuclear Force.
-    """)
+    st.write("HCorp's engine fuses Deuterium and Helium-3. It produces a high-energy Proton, which is directed out the back by a Magnetic Nozzle, achieving an exhaust velocity of 100,000 m/s.")
 
 # --- TAB 4: THE LUNAR EXTRACTION ---
 with tab4:
@@ -175,3 +134,54 @@ with tab4:
 with tab5:
     st.header("💰 Project Scions: Economic Analysis")
     st.write("Prove to investors why HCorp's Fusion Drive is the most cost-effective way to reach Mars.")
+
+# --- TAB 6: THE AI CORE ---
+with tab6:
+    st.header("🤖 HCorp Strategic AI Core")
+    st.write("Welcome, Founder. I am the HCorp Strategic AI. I am here to assist with mission architecture, risk assessment, and strategic planning for Project Scions.")
+    
+    # Initialize chat history
+    if "messages" not in st.session_state:
+        st.session_state.messages = [{"role": "assistant", "content": "HCorp AI Core online. How can I assist you with the Mars colonization protocol today?"}]
+
+    # Display chat messages from history on app rerun
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+    # Accept user input
+    if prompt := st.chat_input("Query the HCorp AI..."):
+        # Add user message to chat history
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        # Display user message in chat message container
+        with st.chat_message("user"):
+            st.markdown(prompt)
+
+        # Generate AI response based on keywords
+        prompt_lower = prompt.lower()
+        response = ""
+        
+        if "chemical" in prompt_lower or "rocket" in prompt_lower:
+            response = "Analysis: Chemical rockets are structurally impossible for fast transit. At 55M km, a 16-day transit requires a mass ratio of 2.2 quadrillion. We would need more fuel than exists in the solar system. Recommend immediate shift to Fusion."
+        elif "fusion" in prompt_lower or "hcorp" in prompt_lower:
+            response = "Analysis: The HCorp Direct Fusion Drive is the only mathematically viable solution. Using Deuterium-He3 fusion, we achieve an exhaust velocity of 100,000 m/s. A 16-day transit requires a mass ratio of only 4.91. Payload capacity is massive."
+        elif "cost" in prompt_lower or "money" in prompt_lower or "economy" in prompt_lower:
+            response = "Analysis: Launching chemical fuel costs $429M per mission. The HCorp Fusion Drive reduces mission costs to $11.6M. Over a decade of Martian colonization, this saves trillions. ROI is astronomical."
+        elif "moon" in prompt_lower or "helium" in prompt_lower or "fuel" in prompt_lower:
+            response = "Analysis: The Moon is our primary Helium-3 mining target. Lunar regolith contains ~20 ppb of He-3. We must deploy nuclear fission-powered mining rovers to excavate and heat the regolith to extract the fuel."
+        elif "g-force" in prompt_lower or "crew" in prompt_lower or "human" in prompt_lower:
+            response = "Analysis: At 55M km, a 16-day transit produces only 0.01 G of sustained acceleration. The crew will experience microgravity, requiring rigorous exercise regimens to prevent bone density loss. This is optimal for crew safety."
+        elif "hello" in prompt_lower or "hi" in prompt_lower:
+            response = "HCorp AI Core online. Awaiting your command, Founder."
+        elif "who are you" in prompt_lower:
+            response = "I am the HCorp Strategic AI Core, a rule-based expert system designed to evaluate mission telemetry and ensure the success of Project Scions."
+        elif "help" in prompt_lower:
+            response = "I can analyze: 'chemical rockets', 'fusion drive', 'cost/money', 'moon/helium-3', and 'g-force/crew safety'. What parameters shall we review?"
+        else:
+            response = f"Data not found for '{prompt}'. I am currently trained on Project Scions telemetry. Please ask about Fusion Drives, Chemical Rockets, Mission Costs, Lunar Extraction, or Crew G-Forces."
+            
+        # Add AI response to chat history
+        st.session_state.messages.append({"role": "assistant", "content": response})
+        # Display AI response
+        with st.chat_message("assistant"):
+            st.markdown(response)
