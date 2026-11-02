@@ -14,6 +14,20 @@ It mathematically demonstrates why traditional chemical rockets are structurally
 * **Web Framework:** Streamlit
 * **Data Visualization:** Matplotlib
 
+# Project Scions: Optimal Mission Profile
+
+Distance: 55 Million km (Closest Approach)
+
+Transit Time: 16 Days
+
+Propulsion: HCorp Direct Fusion Drive
+
+Launch: Orbital Assembly
+
+Crew Environment: 0.01 G (Microgravity)
+
+Mass Ratio: 4.91 (Fusion)
+
 ---
 Founder: Jake (Age 20)
 
